@@ -22,17 +22,17 @@ window.resizable(False, False)
 canvas = Canvas()
 canvas.grid(pady=30, padx=30)
 
-label = Label(canvas, text='Welcome to typing speed test!')
-label.grid(column=1, row=0, pady=10, padx=100)
+label = Label(canvas, text='Welcome to typing speed tester!')
+label.grid(column=1, row=0, pady=30, padx=200)
 
-start_btn = Button(canvas, text='Click to begin', command=start_test)
-start_btn.grid(column=1, row=1, pady=10, padx=100)
+start_btn = Button(canvas, text='Click to begin', width=20, command=start_test)
+start_btn.grid(column=1, row=1, pady=10, padx=200)
 
 info_btn = Button(canvas, text='ℹ️', command=display_info)
-info_btn.grid(column=2, row=2, pady=10, padx=10)
+info_btn.grid(column=1, row=3, pady=10, padx=200)
 
-hs_btn = Button(canvas, text='High scores', command=show_highscores)
-hs_btn.grid(column=1, row=2, pady=10, padx=100)
+hs_btn = Button(canvas, text='High scores', width=20, command=show_highscores)
+hs_btn.grid(column=1, row=2, pady=10, padx=200)
 
-window.after(4000, window.destroy)
+window.after(6000, window.destroy)
 window.mainloop()
