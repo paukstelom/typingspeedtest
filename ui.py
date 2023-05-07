@@ -1,7 +1,7 @@
 from math import floor
-from tkinter import Tk, Label, Button, Canvas, Entry
+from tkinter import Tk, Label, Button, Canvas, Entry, END
 
-TEST_TIME_IN_SECONDS = 60
+from text import text
 
 
 class Display:
@@ -76,23 +76,26 @@ class Display:
         return_btn.grid(column=1, row=6, pady=10, padx=200)
 
     def typing_test(self):
+        TEST_TIME_IN_SECONDS = 5
+        WORDS = [word for word in text.split()]
+
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
 
         label = Label(canvas, text='Test goes here')
         label.grid(column=1, row=1, pady=100, padx=20)
 
-        text_input = Entry(canvas, width=50)
+        text_input = Entry(canvas, width=50, exportselection=False)
         text_input.grid(column=0, columnspan=3, row=2)
 
         misc_label = Label(canvas, text='Something here')
         misc_label.grid(column=2, row=0)
 
-        def testfunc():
+        def break_test():
             canvas.destroy()
             self.create_home_screen()
 
-        return_btn = Button(canvas, text='Back', command=testfunc)
+        return_btn = Button(canvas, text='Back', command=break_test)
         return_btn.grid(column=1, row=3, pady=50, padx=200)
 
         timer = Label(canvas, text=f'')
@@ -109,8 +112,17 @@ class Display:
 
             if seconds > 0:
                 self.window.after(1000, test_countdown, seconds - 1)
+            else:
+                break_test()
 
         test_countdown(TEST_TIME_IN_SECONDS)
+
+        while True:
+            self.window.update()
+            contents = text_input.get()
+            if contents == 'nice':
+                text_input.delete(0, END)
+                print(contents)
 
     def show_info(self):
         canvas = Canvas()
