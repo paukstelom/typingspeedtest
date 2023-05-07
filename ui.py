@@ -1,13 +1,15 @@
 from math import floor
-from tkinter import Tk, Label, Button, Canvas, Entry, END
+from tkinter import Tk, Label, Button, Canvas, Entry, END, StringVar
 
 from text import text
 
-
 class Display:
     def __init__(self):
+        self.test_running: bool = False
+        self.words: list = [word for word in text.split()]
+        self.test_time: int = 5
         self.window = Tk()
-        self.highscores = [
+        self.highscores: list = [
             {'score': 142, 'name': 'Martin'},
             {'score': 11, 'name': 'Tom'},
             {'score': 142, 'name': 'John'},
@@ -76,8 +78,6 @@ class Display:
         return_btn.grid(column=1, row=6, pady=10, padx=200)
 
     def typing_test(self):
-        TEST_TIME_IN_SECONDS = 5
-        WORDS = [word for word in text.split()]
 
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
@@ -85,7 +85,7 @@ class Display:
         label = Label(canvas, text='Test goes here')
         label.grid(column=1, row=1, pady=100, padx=20)
 
-        text_input = Entry(canvas, width=50, exportselection=False)
+        text_input = Entry(canvas, width=50, exportselection=False, textvariable=StringVar())
         text_input.grid(column=0, columnspan=3, row=2)
 
         misc_label = Label(canvas, text='Something here')
@@ -95,8 +95,11 @@ class Display:
             canvas.destroy()
             self.create_home_screen()
 
-        return_btn = Button(canvas, text='Back', command=break_test)
-        return_btn.grid(column=1, row=3, pady=50, padx=200)
+        def cancel_test():
+            pass
+
+        cancel_btn = Button(canvas, text='Stop', command=cancel_test)
+        cancel_btn.grid(column=1, row=3, pady=50, padx=200)
 
         timer = Label(canvas, text=f'')
         timer.grid(column=0, row=0)
@@ -113,16 +116,20 @@ class Display:
             if seconds > 0:
                 self.window.after(1000, test_countdown, seconds - 1)
             else:
-                break_test()
+                self.test_running = False
 
-        test_countdown(TEST_TIME_IN_SECONDS)
+        self.test_running = True
 
-        while True:
+        test_countdown(self.test_time)
+
+        while self.test_running:
             self.window.update()
             contents = text_input.get()
             if contents == 'nice':
                 text_input.delete(0, END)
                 print(contents)
+
+        break_test()
 
     def show_info(self):
         canvas = Canvas()
