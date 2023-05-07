@@ -3,6 +3,7 @@ from tkinter import Tk, Label, Button, Canvas, Entry, END, StringVar
 
 from text import text
 
+
 class Display:
     def __init__(self):
         self.test_running: bool = False
@@ -29,6 +30,10 @@ class Display:
     def clear_window(self):
         for item in self.window.winfo_children():
             item.destroy()
+
+    def go_home(self):
+        self.clear_window()
+        self.create_home_screen()
 
     def create_home_screen(self):
         def start_test():
@@ -63,10 +68,6 @@ class Display:
         canvas = Canvas()
         canvas.pack(anchor='center', pady=80)
 
-        def testfunc():
-            canvas.destroy()
-            self.create_home_screen()
-
         label = Label(canvas, text='Highscores:')
         label.grid(column=1, row=0, pady=10, padx=200)
 
@@ -74,7 +75,17 @@ class Display:
             hs = Label(canvas, text=f'Name {high_score["name"]}, Score: {high_score["score"]}')
             hs.grid(column=1)
 
-        return_btn = Button(canvas, text='Back', command=testfunc)
+        return_btn = Button(canvas, text='Back', command=self.go_home)
+        return_btn.grid(column=1, row=6, pady=10, padx=200)
+
+    def show_results(self):
+        canvas = Canvas()
+        canvas.pack(anchor='center', pady=30, padx=30)
+
+        label = Label(canvas, text='Results goes here')
+        label.grid(column=1, row=1, pady=100, padx=20)
+
+        return_btn = Button(canvas, text='Back', command=self.go_home)
         return_btn.grid(column=1, row=6, pady=10, padx=200)
 
     def typing_test(self):
@@ -91,14 +102,11 @@ class Display:
         misc_label = Label(canvas, text='Something here')
         misc_label.grid(column=2, row=0)
 
-        def break_test():
-            canvas.destroy()
-            self.create_home_screen()
+        def end_test():
+            self.clear_window()
+            self.show_results()
 
-        def cancel_test():
-            pass
-
-        cancel_btn = Button(canvas, text='Stop', command=cancel_test)
+        cancel_btn = Button(canvas, text='Stop', command=self.go_home)
         cancel_btn.grid(column=1, row=3, pady=50, padx=200)
 
         timer = Label(canvas, text=f'')
@@ -126,10 +134,10 @@ class Display:
             self.window.update()
             contents = text_input.get()
             if contents == 'nice':
-                text_input.delete(0, END)
                 print(contents)
+                text_input.delete(0, END)
 
-        break_test()
+        end_test()
 
     def show_info(self):
         canvas = Canvas()
