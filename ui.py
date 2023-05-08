@@ -9,6 +9,7 @@ class Display:
         self.test_running: bool = False
         self.words: list = [word for word in text.split()]
         self.test_time: int = 5
+        self.timer_id: None | str = None
         self.window = Tk()
         self.highscores: list = [
             {'score': 142, 'name': 'Martin'},
@@ -90,11 +91,16 @@ class Display:
 
     def typing_test(self):
 
+        def end_test():
+            self.window.after_cancel(self.timer_id)
+            self.clear_window()
+            self.show_results()
+
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
 
-        label = Label(canvas, text='Test goes here')
-        label.grid(column=1, row=1, pady=100, padx=20)
+        text_display = Label(canvas, text='Test goes here and there\n')
+        text_display.grid(column=1, row=1, pady=100, padx=20)
 
         text_input = Entry(canvas, width=50, exportselection=False, textvariable=StringVar())
         text_input.grid(column=0, columnspan=3, row=2)
@@ -115,13 +121,12 @@ class Display:
                 sec_count = f'0{sec_count}'
 
             display_time = f'TIME LEFT: {min_count}:{sec_count}'
-            try:
-                timer.configure(text=display_time)
-            except TclError:
-                pass
+
+            timer.configure(text=display_time)
 
             if seconds > 0:
-                self.window.after(1000, test_countdown, seconds - 1)
+
+                self.timer_id = self.window.after(1000, test_countdown, seconds - 1)
             else:
                 self.test_running = False
 
@@ -136,11 +141,7 @@ class Display:
                     print(contents)
                     text_input.delete(0, END)
             except TclError:
-                pass
-
-        def end_test():
-            self.clear_window()
-            self.show_results()
+                break
 
         end_test()
 
