@@ -1,5 +1,5 @@
 from math import floor
-from tkinter import Tk, Label, Button, Canvas, Entry, END, StringVar
+from tkinter import Tk, Label, Button, Canvas, Entry, END, StringVar, TclError
 
 from text import text
 
@@ -102,10 +102,6 @@ class Display:
         misc_label = Label(canvas, text='Something here')
         misc_label.grid(column=2, row=0)
 
-        def end_test():
-            self.clear_window()
-            self.show_results()
-
         cancel_btn = Button(canvas, text='Stop', command=self.go_home)
         cancel_btn.grid(column=1, row=3, pady=50, padx=200)
 
@@ -119,7 +115,10 @@ class Display:
                 sec_count = f'0{sec_count}'
 
             display_time = f'TIME LEFT: {min_count}:{sec_count}'
-            timer.configure(text=display_time)
+            try:
+                timer.configure(text=display_time)
+            except TclError:
+                pass
 
             if seconds > 0:
                 self.window.after(1000, test_countdown, seconds - 1)
@@ -127,15 +126,21 @@ class Display:
                 self.test_running = False
 
         self.test_running = True
-
         test_countdown(self.test_time)
 
         while self.test_running:
             self.window.update()
-            contents = text_input.get()
-            if contents == 'nice':
-                print(contents)
-                text_input.delete(0, END)
+            try:
+                contents = text_input.get()
+                if contents == 'nice':
+                    print(contents)
+                    text_input.delete(0, END)
+            except TclError:
+                pass
+
+        def end_test():
+            self.clear_window()
+            self.show_results()
 
         end_test()
 
