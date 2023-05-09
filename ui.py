@@ -9,6 +9,8 @@ class Display:
         self.test_running: bool = False
         self.words: list = [word for word in text.split()]
         self.test_time: int = 70
+        self.current_word_pos: int = 0
+        self.current_word = self.words[self.current_word_pos]
         self.timer_id: None | str = None
         self.window = Tk()
         self.highscores: list = [
@@ -99,14 +101,16 @@ class Display:
         canvas = Canvas(highlightthickness=0)
         canvas.pack(anchor='center', pady=10, padx=10)
 
-        main_text_display = Label(canvas, text='MAIN TEXT', font=("Arial", 20, 'bold'))
+        main_text_display = Label(canvas, text=f'{self.current_word}', font=("Arial", 20, 'bold'))
         main_text_display.grid(column=1, row=1, ipadx=220, pady=50)
 
-        def push_text() -> str:
-            main_word = self.words[0]
-            del self.words[0]
-            main_text_display.configure(text=f'{main_word}')
-            return main_word
+        def push_text():
+            self.current_word_pos += 1
+            print(self.current_word)
+            display_text = ''
+            for word in self.words[:self.current_word_pos + 6]:
+                display_text += f'{word} '
+            main_text_display.configure(text=f'{display_text}')
 
         text_input = Entry(canvas, width=30, exportselection=False, textvariable=StringVar())
         text_input.grid(column=0, columnspan=3, row=3, ipady=10, pady=30)
@@ -135,15 +139,13 @@ class Display:
 
         self.test_running = True
         test_countdown(self.test_time)
-        text_word = push_text()
-        print(text_word)
 
         while self.test_running:
             self.window.update()
             try:
                 user_input = text_input.get()
-                if user_input == text_word:
-                    text_word = push_text()
+                if user_input == self.words[self.current_word_pos]:
+                    push_text()
                     text_input.delete(0, END)
 
                 if user_input == 'nice':
@@ -245,6 +247,3 @@ class Display:
         label.grid(column=1, row=0, pady=30, padx=200)
         return_btn = Button(canvas, text='Back', command=testfunc)
         return_btn.grid(column=1, row=3, pady=10, padx=200)
-
-
-
