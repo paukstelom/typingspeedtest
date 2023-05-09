@@ -25,8 +25,8 @@ class Display:
     def window_setup(self):
         self.window.title('Typing Speed Test')
         self.window.config(padx=30, pady=30)
-        self.window.geometry('800x500')
-        self.window.resizable(False, False)
+        self.window.geometry('1000x500')
+        # self.window.resizable(False, False)
 
     def clear_window(self):
         for item in self.window.winfo_children():
@@ -96,35 +96,26 @@ class Display:
             self.clear_window()
             self.show_results()
 
-        canvas = Canvas()
-        canvas.pack(anchor='center', pady=30, padx=30)
+        canvas = Canvas(highlightthickness=0)
+        canvas.pack(anchor='center', pady=10, padx=10)
 
         main_text_display = Label(canvas, text='MAIN TEXT', font=("Arial", 20, 'bold'))
-        main_text_display.grid(column=1, row=1, pady=20, padx=20)
-
-        secondary_text_display = Label(canvas, text='secondary text', font=("Arial", 20))
-        secondary_text_display.grid(column=1, row=2, pady=10, padx=20)
+        main_text_display.grid(column=1, row=1, ipadx=220, pady=50)
 
         def push_text() -> str:
-            main_line = " ".join(self.words[0:5])
-            del self.words[:5]
-            main_text_display.configure(text=f'{main_line}')
-            second_line = " ".join(self.words[0:5])
-            third_line = " ".join(self.words[5:10])
-            secondary_text_display.configure(text=f'{second_line}\n{third_line}')
-            return main_line
+            main_word = self.words[0]
+            del self.words[0]
+            main_text_display.configure(text=f'{main_word}')
+            return main_word
 
-        text_input = Entry(canvas, width=50, exportselection=False, textvariable=StringVar())
-        text_input.grid(column=0, columnspan=3, row=3)
-
-        misc_label = Label(canvas, text='Something here')
-        misc_label.grid(column=2, row=0)
+        text_input = Entry(canvas, width=30, exportselection=False, textvariable=StringVar())
+        text_input.grid(column=0, columnspan=3, row=3, ipady=10, pady=30)
 
         cancel_btn = Button(canvas, text='Stop', command=self.go_home)
-        cancel_btn.grid(column=1, row=4, pady=50, padx=200)
+        cancel_btn.grid(column=1, row=4, pady=20)
 
         timer = Label(canvas, text=f'')
-        timer.grid(column=0, row=0)
+        timer.grid(column=1, row=0, ipady=20, pady=0)
 
         def test_countdown(seconds):
             min_count = floor(seconds / 60)
@@ -144,24 +135,103 @@ class Display:
 
         self.test_running = True
         test_countdown(self.test_time)
-        text_line = push_text()
-        print(text_line)
+        text_word = push_text()
+        print(text_word)
 
         while self.test_running:
             self.window.update()
             try:
                 user_input = text_input.get()
-                if user_input == text_line:
-                    text_line = push_text()
+                if user_input == text_word:
+                    text_word = push_text()
                     text_input.delete(0, END)
 
                 if user_input == 'nice':
                     print(user_input)
                     text_input.delete(0, END)
+
             except TclError:
                 break
 
+        self.words: list = [word for word in text.split()]
         end_test()
+
+    # def typing_test(self):
+    #
+    #     def end_test():
+    #         self.window.after_cancel(self.timer_id)
+    #         self.clear_window()
+    #         self.show_results()
+    #
+    #     canvas = Canvas(highlightthickness=0)
+    #     canvas.pack(anchor='center', pady=10, padx=10)
+    #
+    #     main_text_display = Label(canvas, text='MAIN TEXT', font=("Arial", 20, 'bold'))
+    #     main_text_display.grid(column=1, row=1, ipadx=220)
+    #
+    #     secondary_text_display = Label(canvas, text='secondary text', font=("Arial", 20))
+    #     secondary_text_display.grid(column=1, row=2)
+    #
+    #     def push_text() -> str:
+    #         main_line = " ".join(self.words[0:5])
+    #         del self.words[:5]
+    #         main_text_display.configure(text=f'{main_line}')
+    #         second_line = " ".join(self.words[0:5])
+    #
+    #         third_line = " ".join(self.words[5:10])
+    #         secondary_text_display.configure(text=f'{second_line}\n{third_line}')
+    #         return main_line
+    #
+    #     text_input = Entry(canvas, width=30, exportselection=False, textvariable=StringVar())
+    #     text_input.grid(column=0, columnspan=3, row=3, ipady=10, pady=30)
+    #
+    #     misc_label = Label(canvas, text='Something here')
+    #     misc_label.grid(column=2, row=0, ipady=20, padx=0)
+    #
+    #     cancel_btn = Button(canvas, text='Stop', command=self.go_home)
+    #     cancel_btn.grid(column=1, row=4, pady=20)
+    #
+    #     timer = Label(canvas, text=f'')
+    #     timer.grid(column=0, row=0, ipady=20, pady=0)
+    #
+    #     def test_countdown(seconds):
+    #         min_count = floor(seconds / 60)
+    #         sec_count = seconds % 60
+    #         if sec_count < 10:
+    #             sec_count = f'0{sec_count}'
+    #
+    #         display_time = f'TIME LEFT: {min_count}:{sec_count}'
+    #
+    #         timer.configure(text=display_time)
+    #
+    #         if seconds > 0:
+    #
+    #             self.timer_id = self.window.after(1000, test_countdown, seconds - 1)
+    #         else:
+    #             self.test_running = False
+    #
+    #     self.test_running = True
+    #     test_countdown(self.test_time)
+    #     text_line = push_text()
+    #     print(text_line)
+    #
+    #     while self.test_running:
+    #         self.window.update()
+    #         try:
+    #             user_input = text_input.get()
+    #             if user_input == text_line:
+    #                 text_line = push_text()
+    #                 text_input.delete(0, END)
+    #
+    #             if user_input == 'nice':
+    #                 print(user_input)
+    #                 text_input.delete(0, END)
+    #
+    #         except TclError:
+    #             break
+    #
+    #     self.words: list = [word for word in text.split()]
+    #     end_test()
 
     def show_info(self):
         canvas = Canvas()
@@ -175,3 +245,6 @@ class Display:
         label.grid(column=1, row=0, pady=30, padx=200)
         return_btn = Button(canvas, text='Back', command=testfunc)
         return_btn.grid(column=1, row=3, pady=10, padx=200)
+
+
+
