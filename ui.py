@@ -8,7 +8,7 @@ class Display:
     def __init__(self):
         self.test_running: bool = False
         self.words: list = [word for word in text.split()]
-        self.test_time: int = 5
+        self.test_time: int = 70
         self.timer_id: None | str = None
         self.window = Tk()
         self.highscores: list = [
@@ -99,17 +99,29 @@ class Display:
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
 
-        text_display = Label(canvas, text='Test goes here and there\n')
-        text_display.grid(column=1, row=1, pady=100, padx=20)
+        main_text_display = Label(canvas, text='MAIN TEXT', font=("Arial", 20, 'bold'))
+        main_text_display.grid(column=1, row=1, pady=20, padx=20)
+
+        secondary_text_display = Label(canvas, text='secondary text', font=("Arial", 20))
+        secondary_text_display.grid(column=1, row=2, pady=10, padx=20)
+
+        def push_text() -> str:
+            main_line = " ".join(self.words[0:5])
+            del self.words[:5]
+            main_text_display.configure(text=f'{main_line}')
+            second_line = " ".join(self.words[0:5])
+            third_line = " ".join(self.words[5:10])
+            secondary_text_display.configure(text=f'{second_line}\n{third_line}')
+            return main_line
 
         text_input = Entry(canvas, width=50, exportselection=False, textvariable=StringVar())
-        text_input.grid(column=0, columnspan=3, row=2)
+        text_input.grid(column=0, columnspan=3, row=3)
 
         misc_label = Label(canvas, text='Something here')
         misc_label.grid(column=2, row=0)
 
         cancel_btn = Button(canvas, text='Stop', command=self.go_home)
-        cancel_btn.grid(column=1, row=3, pady=50, padx=200)
+        cancel_btn.grid(column=1, row=4, pady=50, padx=200)
 
         timer = Label(canvas, text=f'')
         timer.grid(column=0, row=0)
@@ -132,13 +144,19 @@ class Display:
 
         self.test_running = True
         test_countdown(self.test_time)
+        text_line = push_text()
+        print(text_line)
 
         while self.test_running:
             self.window.update()
             try:
-                contents = text_input.get()
-                if contents == 'nice':
-                    print(contents)
+                user_input = text_input.get()
+                if user_input == text_line:
+                    text_line = push_text()
+                    text_input.delete(0, END)
+
+                if user_input == 'nice':
+                    print(user_input)
                     text_input.delete(0, END)
             except TclError:
                 break
