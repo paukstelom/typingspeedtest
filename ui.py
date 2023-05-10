@@ -8,7 +8,7 @@ class Display:
     def __init__(self):
         self.test_running: bool = False
         self.words: list = [word for word in text.split()]
-        self.test_time: int = 70
+        self.test_time: int = 30
         self.timer_id: None | str = None
         self.window = Tk()
         self.highscores: list = [
@@ -26,7 +26,7 @@ class Display:
         self.window.title('Typing Speed Test')
         self.window.config(padx=30, pady=30)
         self.window.geometry('1000x500')
-        # self.window.resizable(False, False)
+        self.window.resizable(False, False)
 
     def clear_window(self):
         for item in self.window.winfo_children():
@@ -99,22 +99,32 @@ class Display:
         canvas = Canvas(highlightthickness=0)
         canvas.pack(anchor='center', pady=10, padx=10)
 
-        main_text_display = Label(canvas, text=f'Delete this later', font=("Arial", 20, 'bold'))
-        main_text_display.grid(column=1, row=2, ipadx=220, pady=0)
+        main_text_display = Label(canvas, text=f'Delete this later', font=("Arial", 16, 'bold'))
+        main_text_display.grid(column=1, row=2, ipadx=20, pady=0)
 
-        above_text_display = Label(canvas, text=f'', font=("Arial", 20))
-        above_text_display.grid(column=1, row=1, ipadx=220, pady=0)
+        above_text_display = Label(canvas, text=f'', font=("Arial", 15))
+        above_text_display.grid(column=1, row=1, ipadx=20, pady=0)
 
-        below_text_display = Label(canvas, text=f'Delete this later', font=("Arial", 20))
-        below_text_display.grid(column=1, row=3, ipadx=220, pady=0)
+        below_text_display = Label(canvas, text=f'Delete this later', font=("Arial", 15))
+        below_text_display.grid(column=1, row=3, ipadx=20, pady=0)
 
         def push_text(checked_line: str) -> str:
 
+            main_line = ''
+            second_line = ''
+            word_number = 0
+            for word in self.words:
+                word_number += 1
+                main_line += f'{word} '
+                if len(main_line) > 50:
+                    break
 
+            for word in self.words[word_number:]:
+                second_line += f'{word} '
+                if len(second_line) > 50:
+                    break
 
-            main_line = " ".join(self.words[0:5])
-            second_line = " ".join(self.words[5:10])
-            del self.words[:5]
+            del self.words[:word_number]
 
             above_text_display.configure(text=f'{checked_line}')
             main_text_display.configure(text=f'{main_line} ')
@@ -122,8 +132,8 @@ class Display:
 
             return main_line
 
-        text_input = Entry(canvas, width=30, exportselection=False, textvariable=StringVar())
-        text_input.grid(column=0, columnspan=3, row=4, ipady=10, pady=30)
+        text_input = Entry(canvas, width=50, exportselection=False, textvariable=StringVar())
+        text_input.grid(column=0, columnspan=3, row=4, ipady=10, pady=50)
 
         cancel_btn = Button(canvas, text='Stop', command=self.go_home)
         cancel_btn.grid(column=1, row=5, pady=20)
@@ -149,7 +159,7 @@ class Display:
 
         self.test_running = True
         test_countdown(self.test_time)
-        text_line = push_text(checked_line='')
+        text_line = push_text(checked_line=' ')
         print(text_line)
 
         while self.test_running:
