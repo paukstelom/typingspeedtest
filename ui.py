@@ -12,13 +12,10 @@ class Display:
         self.correct_words: str = ''
         self.timer_id: None | str = None
         self.window = Tk()
-        self.highscores: list = [
-            {'score': 142, 'name': 'Martin'},
-            {'score': 11, 'name': 'Tom'},
-            {'score': 142, 'name': 'John'},
-            {'score': 122, 'name': 'Mike'},
-            {'score': 111, 'name': 'Tonny'}
-        ]
+
+        with open('scores.txt', 'r') as file:
+            self.highscores = file.read()
+
         self.window_setup()
         self.create_home_screen()
         self.window.mainloop()
@@ -74,7 +71,7 @@ class Display:
         label.grid(column=1, row=0, pady=10, padx=200)
 
         for high_score in self.highscores:
-            hs = Label(canvas, text=f'Name {high_score["name"]}, Score: {high_score["score"]}')
+            hs = Label(canvas, text=f'Name ')
             hs.grid(column=1)
 
         return_btn = Button(canvas, text='Back', command=self.go_home)
@@ -181,10 +178,8 @@ class Display:
             chars_per_min = len(self.correct_words) / self.test_time * 60
             words_per_min = len(self.correct_words.rstrip().split(' ')) / self.test_time * 60
 
-            print(last_input)
-            print(current_line)
-            print(chars_per_min)
-            print(words_per_min)
+            with open('scores.txt', 'w') as file:
+                file.write(self.highscores)
 
         calculate_score(text_input.get(), text_line)
         self.words: list = [word for word in text.split()]
@@ -194,11 +189,8 @@ class Display:
         canvas = Canvas()
         canvas.pack(anchor='center', pady=80)
 
-        def testfunc():
-            canvas.destroy()
-            self.create_home_screen()
-
         label = Label(canvas, text='Info goes here')
         label.grid(column=1, row=0, pady=30, padx=200)
-        return_btn = Button(canvas, text='Back', command=testfunc)
+
+        return_btn = Button(canvas, text='Go home', command=self.go_home)
         return_btn.grid(column=1, row=3, pady=10, padx=200)
