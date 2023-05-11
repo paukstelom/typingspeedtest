@@ -8,7 +8,8 @@ class Display:
     def __init__(self):
         self.test_running: bool = False
         self.words: list = [word for word in text.split()]
-        self.test_time: int = 30
+        self.test_time: int = 20
+        self.correct_words: str = ''
         self.timer_id: None | str = None
         self.window = Tk()
         self.highscores: list = [
@@ -99,13 +100,13 @@ class Display:
         canvas = Canvas(highlightthickness=0)
         canvas.pack(anchor='center', pady=10, padx=10)
 
-        main_text_display = Label(canvas, text=f'Delete this later', font=("Arial", 16, 'bold'))
+        main_text_display = Label(canvas, font=("Arial", 16, 'bold'))
         main_text_display.grid(column=1, row=2, ipadx=20, pady=0)
 
-        above_text_display = Label(canvas, text=f'', font=("Arial", 15))
+        above_text_display = Label(canvas, font=("Arial", 15))
         above_text_display.grid(column=1, row=1, ipadx=20, pady=0)
 
-        below_text_display = Label(canvas, text=f'Delete this later', font=("Arial", 15))
+        below_text_display = Label(canvas, font=("Arial", 15))
         below_text_display.grid(column=1, row=3, ipadx=20, pady=0)
 
         def push_text(checked_line: str) -> str:
@@ -113,6 +114,7 @@ class Display:
             main_line = ''
             second_line = ''
             word_number = 0
+
             for word in self.words:
                 word_number += 1
                 main_line += f'{word} '
@@ -148,30 +150,43 @@ class Display:
                 sec_count = f'0{sec_count}'
 
             display_time = f'TIME LEFT: {min_count}:{sec_count}'
-
             timer.configure(text=display_time)
 
             if seconds > 0:
-
                 self.timer_id = self.window.after(1000, test_countdown, seconds - 1)
+
             else:
                 self.test_running = False
 
         self.test_running = True
         test_countdown(self.test_time)
         text_line = push_text(checked_line=' ')
-        print(text_line)
 
         while self.test_running:
             self.window.update()
             try:
                 user_input = text_input.get()
                 if user_input == text_line:
+                    self.correct_words += user_input
                     text_line = push_text(checked_line=text_line)
                     text_input.delete(0, END)
             except TclError:
                 break
 
+        def calculate_score(last_input: str, current_line: str):
+            for index, word in enumerate(last_input.split(' ')):
+                if word == current_line.split(' ')[index]:
+                    self.correct_words += f'{word} '
+
+            chars_per_min = len(self.correct_words) / self.test_time * 60
+            words_per_min = len(self.correct_words.rstrip().split(' ')) / self.test_time * 60
+
+            print(last_input)
+            print(current_line)
+            print(chars_per_min)
+            print(words_per_min)
+
+        calculate_score(text_input.get(), text_line)
         self.words: list = [word for word in text.split()]
         end_test()
 
