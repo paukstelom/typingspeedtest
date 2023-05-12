@@ -8,8 +8,9 @@ class Display:
     def __init__(self):
         self.test_running: bool = False
         self.words: list = [word for word in medium_text.split()]
-        self.test_time: int = 20
+        self.test_time: int = 5
         self.correct_words: str = ''
+        self.name = 'unspecified'
         self.timer_id: None | str = None
         self.window = Tk()
 
@@ -42,14 +43,13 @@ class Display:
         start_btn = Button(home_screen, text='Click to begin', width=20, command=self.choose_difficulty)
         start_btn.grid(column=1, row=1, pady=10, padx=200)
 
-        info_btn = Button(home_screen, text='ℹ️', command=self.show_info)
+        info_btn = Button(home_screen, text='ℹ️', command=self.create_info_wn)
         info_btn.grid(column=1, row=3, pady=10, padx=200)
 
         hs_btn = Button(home_screen, text='High scores', width=20, command=self.show_highscores)
         hs_btn.grid(column=1, row=2, pady=10, padx=200)
 
     def show_highscores(self):
-
         self.clear_window()
 
         canvas = Canvas()
@@ -66,8 +66,8 @@ class Display:
         return_btn.grid(column=1, row=6, pady=10, padx=200)
 
     def show_results(self):
-
         self.clear_window()
+
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
 
@@ -91,7 +91,8 @@ class Display:
                 self.words = [word for word in hard_text.split()]
 
         self.clear_window()
-        canvas = Canvas()
+
+        canvas = Canvas(highlightthickness=0)
         canvas.pack(anchor='center', pady=30, padx=30)
 
         Label(canvas, text='Choose your difficulty:', font=("Arial", 16, 'bold')
@@ -121,9 +122,19 @@ class Display:
 
         Label(canvas, text='Your name:').grid(column=0, row=3, pady=10, padx=10)
 
-        Entry(canvas).grid(column=1, row=3, columnspan=3, pady=10, padx=10)
+        name_entry = Entry(canvas)
+        name_entry.grid(column=1, row=3, columnspan=3, pady=10, padx=10)
 
-        start_btn = Button(canvas, text='Start', width=7, command=self.typing_test)
+        def begin_test():
+            name = name_entry.get()
+
+            if name == '':
+                name = 'unspecified'
+
+            self.name = name
+            self.typing_test()
+
+        start_btn = Button(canvas, text='Start', width=7, command=begin_test)
         start_btn.grid(column=1, row=4, pady=10, padx=10)
 
         return_btn = Button(canvas, text='Back', width=7, command=self.create_home_screen)
@@ -232,13 +243,14 @@ class Display:
 
         end_test()
 
-    def show_info(self):
+    def create_info_wn(self):
         self.clear_window()
         canvas = Canvas()
-        canvas.pack(anchor='center', pady=80)
-
-        label = Label(canvas, text='Info goes here')
-        label.grid(column=1, row=0, pady=30, padx=200)
-
-        return_btn = Button(canvas, text='Go home', command=self.create_home_screen)
-        return_btn.grid(column=1, row=3, pady=10, padx=200)
+        canvas.pack(anchor='center', pady=40)
+        Label(canvas, text='Information', font=("Arial", 16, 'bold')).grid(column=1, row=0, padx=200, pady=20)
+        Label(canvas, text='* This typing test does not check for errors').grid(column=1, row=1, pady=10, padx=200)
+        Label(canvas, text='* Only 3 times supported: 30s, 1min, 2mins').grid(column=1, row=2, pady=10, padx=200)
+        Label(canvas, text='* Only 3 different text with different difficulties').grid(column=1, row=3, pady=10, padx=200)
+        Label(canvas, text='* If name is unspecified it will note as undefined').grid(column=1, row=4, pady=10, padx=200)
+        Label(canvas, text='* High scores are saved internally').grid(column=1, row=5, pady=10, padx=200)
+        Button(canvas, text='Go home', command=self.create_home_screen).grid(column=1, row=6, pady=20, padx=200)
