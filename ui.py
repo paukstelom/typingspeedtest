@@ -1,13 +1,13 @@
 from math import floor
 from tkinter import Tk, Label, Button, Canvas, Entry, END, StringVar, TclError
 
-from text import text
+from texts import medium_text, easy_text, hard_text
 
 
 class Display:
     def __init__(self):
         self.test_running: bool = False
-        self.words: list = [word for word in text.split()]
+        self.words: list = [word for word in medium_text.split()]
         self.test_time: int = 20
         self.correct_words: str = ''
         self.timer_id: None | str = None
@@ -30,23 +30,8 @@ class Display:
         for item in self.window.winfo_children():
             item.destroy()
 
-    def go_home(self):
-        self.clear_window()
-        self.create_home_screen()
-
     def create_home_screen(self):
-        def start_test():
-            self.clear_window()
-            self.choose_difficulty()
-
-        def display_info():
-            self.clear_window()
-            self.show_info()
-            pass
-
-        def show_highscores():
-            self.clear_window()
-            self.show_highscores()
+        self.clear_window()
 
         home_screen = Canvas()
         home_screen.pack(anchor='center', pady=80)
@@ -54,16 +39,19 @@ class Display:
         label = Label(home_screen, text='Welcome to typing speed tester!')
         label.grid(column=1, row=0, pady=30, padx=200)
 
-        start_btn = Button(home_screen, text='Click to begin', width=20, command=start_test)
+        start_btn = Button(home_screen, text='Click to begin', width=20, command=self.choose_difficulty)
         start_btn.grid(column=1, row=1, pady=10, padx=200)
 
-        info_btn = Button(home_screen, text='ℹ️', command=display_info)
+        info_btn = Button(home_screen, text='ℹ️', command=self.show_info)
         info_btn.grid(column=1, row=3, pady=10, padx=200)
 
-        hs_btn = Button(home_screen, text='High scores', width=20, command=show_highscores)
+        hs_btn = Button(home_screen, text='High scores', width=20, command=self.show_highscores)
         hs_btn.grid(column=1, row=2, pady=10, padx=200)
 
     def show_highscores(self):
+
+        self.clear_window()
+
         canvas = Canvas()
         canvas.pack(anchor='center', pady=80)
 
@@ -74,64 +62,80 @@ class Display:
         hs = Label(canvas, text=f'Name')
         hs.grid(column=1)
 
-        return_btn = Button(canvas, text='Back', command=self.go_home)
+        return_btn = Button(canvas, text='Back', command=self.create_home_screen)
         return_btn.grid(column=1, row=6, pady=10, padx=200)
 
     def show_results(self):
+
+        self.clear_window()
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
 
         label = Label(canvas, text='Results goes here')
         label.grid(column=1, row=1, pady=100, padx=20)
 
-        return_btn = Button(canvas, text='Back', command=self.go_home)
+        return_btn = Button(canvas, text='Back', command=self.create_home_screen)
         return_btn.grid(column=1, row=6, pady=10, padx=200)
 
     def choose_difficulty(self):
+
+        def set_time(seconds):
+            self.test_time = seconds
+
+        def choose_text(difficulty: str):
+            if difficulty == 'easy':
+                self.words = [word for word in easy_text.split()]
+            if difficulty == 'medium':
+                self.words = [word for word in medium_text.split()]
+            if difficulty == 'hard':
+                self.words = [word for word in hard_text.split()]
+
+        self.clear_window()
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
 
-        Label(canvas, text='Choose your difficulty:').grid(column=1, row=0, columnspan=2)
+        Label(canvas, text='Choose your difficulty:', font=("Arial", 16, 'bold')
+              ).grid(column=1, row=0, columnspan=2, pady=30, padx=10)
 
-        Label(canvas, text='Time:').grid(column=0, row=1)
+        Label(canvas, text='Time:').grid(column=0, row=1, pady=10, padx=10)
 
-        thirty_sec_btn = Button(canvas, text='30 sec', width=7)
-        thirty_sec_btn.grid(column=1, row=1)
+        thirty_sec_btn = Button(canvas, text='30 sec', width=7, command=lambda: set_time(30))
+        thirty_sec_btn.grid(column=1, row=1, pady=10, padx=10)
 
-        one_min_btn = Button(canvas, text='1 min', width=7)
-        one_min_btn.grid(column=2, row=1)
+        one_min_btn = Button(canvas, text='1 min', width=7, command=lambda: set_time(60))
+        one_min_btn.grid(column=2, row=1, pady=10, padx=10)
 
-        two_min_btn = Button(canvas, text='2min', width=7)
-        two_min_btn.grid(column=3, row=1)
+        two_min_btn = Button(canvas, text='2min', width=7, command=lambda: set_time(120))
+        two_min_btn.grid(column=3, row=1, pady=10, padx=10)
 
-        Label(canvas, text='Text difficulty:').grid(column=0, row=2)
+        Label(canvas, text='Text difficulty:').grid(column=0, row=2, pady=10, padx=10)
 
-        easy_button = Button(canvas, text='Easy', width=7)
-        easy_button.grid(column=1, row=2)
+        easy_button = Button(canvas, text='Easy', width=7, command=lambda: choose_text('easy'))
+        easy_button.grid(column=1, row=2, pady=10, padx=10)
 
-        medium_button = Button(canvas, text='Medium', width=7)
-        medium_button.grid(column=2, row=2)
+        medium_button = Button(canvas, text='Medium', width=7, command=lambda: choose_text('medium'))
+        medium_button.grid(column=2, row=2, pady=10, padx=10)
 
-        hard_button = Button(canvas, text='Hard', width=7)
-        hard_button.grid(column=3, row=2)
+        hard_button = Button(canvas, text='Hard', width=7, command=lambda: choose_text('hard'))
+        hard_button.grid(column=3, row=2, pady=10, padx=10)
 
-        Label(canvas, text='Your name:').grid(column=0, row=3)
+        Label(canvas, text='Your name:').grid(column=0, row=3, pady=10, padx=10)
 
-        Entry(canvas).grid(column=1, row=3, columnspan=3)
+        Entry(canvas).grid(column=1, row=3, columnspan=3, pady=10, padx=10)
 
-        start_btn = Button(canvas, text='Start', width=7, command=self.go_home)
-        start_btn.grid(column=1, row=4)
+        start_btn = Button(canvas, text='Start', width=7, command=self.typing_test)
+        start_btn.grid(column=1, row=4, pady=10, padx=10)
 
-        return_btn = Button(canvas, text='Back', width=7, command=self.go_home)
-        return_btn.grid(column=2, row=4)
+        return_btn = Button(canvas, text='Back', width=7, command=self.create_home_screen)
+        return_btn.grid(column=2, row=4, pady=10, padx=10)
 
     def typing_test(self):
+        self.clear_window()
 
         def end_test():
             self.window.after_cancel(self.timer_id)
-            self.words = [word for word in text.split()]
+            self.words = [word for word in medium_text.split()]
             self.correct_words = ''
-            self.clear_window()
             self.show_results()
 
         canvas = Canvas(highlightthickness=0)
@@ -174,7 +178,7 @@ class Display:
         text_input = Entry(canvas, width=50, exportselection=False, textvariable=StringVar())
         text_input.grid(column=0, columnspan=3, row=4, ipady=10, pady=50)
 
-        cancel_btn = Button(canvas, text='Stop', command=self.go_home)
+        cancel_btn = Button(canvas, text='Stop', command=end_test)
         cancel_btn.grid(column=1, row=5, pady=20)
 
         timer = Label(canvas, text=f'')
@@ -221,16 +225,20 @@ class Display:
             with open('scores.txt', 'w') as file:
                 file.write(self.highscores)
 
-        calculate_score(text_input.get(), text_line)
-        self.words: list = [word for word in text.split()]
+        try:
+            calculate_score(text_input.get(), text_line)
+        except TclError:
+            pass
+
         end_test()
 
     def show_info(self):
+        self.clear_window()
         canvas = Canvas()
         canvas.pack(anchor='center', pady=80)
 
         label = Label(canvas, text='Info goes here')
         label.grid(column=1, row=0, pady=30, padx=200)
 
-        return_btn = Button(canvas, text='Go home', command=self.go_home)
+        return_btn = Button(canvas, text='Go home', command=self.create_home_screen)
         return_btn.grid(column=1, row=3, pady=10, padx=200)
