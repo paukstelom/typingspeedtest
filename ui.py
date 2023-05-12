@@ -37,7 +37,7 @@ class Display:
     def create_home_screen(self):
         def start_test():
             self.clear_window()
-            self.typing_test()
+            self.choose_difficulty()
 
         def display_info():
             self.clear_window()
@@ -70,9 +70,9 @@ class Display:
         label = Label(canvas, text='Highscores:')
         label.grid(column=1, row=0, pady=10, padx=200)
 
-        for high_score in self.highscores:
-            hs = Label(canvas, text=f'Name ')
-            hs.grid(column=1)
+        # for high_score in self.highscores:
+        hs = Label(canvas, text=f'Name')
+        hs.grid(column=1)
 
         return_btn = Button(canvas, text='Back', command=self.go_home)
         return_btn.grid(column=1, row=6, pady=10, padx=200)
@@ -87,10 +87,50 @@ class Display:
         return_btn = Button(canvas, text='Back', command=self.go_home)
         return_btn.grid(column=1, row=6, pady=10, padx=200)
 
+    def choose_difficulty(self):
+        canvas = Canvas()
+        canvas.pack(anchor='center', pady=30, padx=30)
+
+        Label(canvas, text='Choose your difficulty:').grid(column=1, row=0, columnspan=2)
+
+        Label(canvas, text='Time:').grid(column=0, row=1)
+
+        thirty_sec_btn = Button(canvas, text='30 sec', width=7)
+        thirty_sec_btn.grid(column=1, row=1)
+
+        one_min_btn = Button(canvas, text='1 min', width=7)
+        one_min_btn.grid(column=2, row=1)
+
+        two_min_btn = Button(canvas, text='2min', width=7)
+        two_min_btn.grid(column=3, row=1)
+
+        Label(canvas, text='Text difficulty:').grid(column=0, row=2)
+
+        easy_button = Button(canvas, text='Easy', width=7)
+        easy_button.grid(column=1, row=2)
+
+        medium_button = Button(canvas, text='Medium', width=7)
+        medium_button.grid(column=2, row=2)
+
+        hard_button = Button(canvas, text='Hard', width=7)
+        hard_button.grid(column=3, row=2)
+
+        Label(canvas, text='Your name:').grid(column=0, row=3)
+
+        Entry(canvas).grid(column=1, row=3, columnspan=3)
+
+        start_btn = Button(canvas, text='Start', width=7, command=self.go_home)
+        start_btn.grid(column=1, row=4)
+
+        return_btn = Button(canvas, text='Back', width=7, command=self.go_home)
+        return_btn.grid(column=2, row=4)
+
     def typing_test(self):
 
         def end_test():
             self.window.after_cancel(self.timer_id)
+            self.words = [word for word in text.split()]
+            self.correct_words = ''
             self.clear_window()
             self.show_results()
 
