@@ -10,12 +10,16 @@ class Display:
         self.words: list = [word for word in medium_text.split()]
         self.test_time: int = 5
         self.correct_words: str = ''
-        self.player_name = 'unspecified'
-        self.timer_id: None | str = None
-        self.window = Tk()
+        self.player_name: str = ''
+        self.timer_id: str = ''
+        self.window: Tk = Tk()
+        self.scores: list = []
+        self.score = ['', '', '']
 
         with open('scores.txt', 'r') as file:
-            self.highscores = file.read()
+            scores = file.readlines()
+            for score in scores:
+                self.scores.append(score.rstrip().split(','))
 
         self.window_setup()
         self.create_home_screen()
@@ -39,17 +43,20 @@ class Display:
         Button(canvas, text='Click to begin', width=20, command=self.create_test_cnfg_wn).grid(column=1, row=1, pady=10,
                                                                                                padx=200)
         Button(canvas, text='ℹ️', command=self.create_info_wn).grid(column=1, row=3, pady=10, padx=200)
-        Button(canvas, text='High scores', width=20, command=self.create_hs_wn).grid(column=1, row=2, pady=10, padx=200)
+        Button(canvas, text='Scores', width=20, command=self.create_scores_wn).grid(column=1, row=2, pady=10, padx=200)
 
-    def create_hs_wn(self):
+    def create_scores_wn(self):
         self.clear_window()
         canvas = Canvas()
-        canvas.pack(anchor='center', pady=80)
+        canvas.pack(anchor='center', pady=40)
 
-        Label(canvas, text='Highscores:').grid(column=1, row=0, pady=10, padx=200)
+        Label(canvas, text='Scores:', font=("Arial", 20, 'bold')).grid(column=1, row=0, pady=20, padx=200)
 
-        # for high_score in self.highscores:
-        hs = Label(canvas, text=f'Name')
+        scores = ''
+        for score in self.scores:
+            scores += f'Name:  {score[0]},   Words per min:  {score[1]},   Characters per min:  {score[2]}\n\n'
+
+        hs = Label(canvas, text=scores, font=("Arial", 11))
         hs.grid(column=1)
 
         return_btn = Button(canvas, text='Back', command=self.create_home_screen)
@@ -61,10 +68,16 @@ class Display:
         canvas = Canvas()
         canvas.pack(anchor='center', pady=30, padx=30)
 
-        label = Label(canvas, text='Results goes here')
-        label.grid(column=1, row=1, pady=100, padx=20)
+        Label(canvas, text='Results:', font=("Arial", 25, 'bold')).grid(column=1, row=1, pady=30, padx=20)
 
-        Button(canvas, text='Back', command=self.create_home_screen).grid(column=1, row=6, pady=10, padx=200)
+        Label(canvas, font=("Arial", 14), text=f'Name:   {self.score[0]}\n\n'
+                                               f'Words per min:   {self.score[1]}\n\n'
+                                               f'Characters per min:   {self.score[2]}').grid(column=1, row=2,
+                                                                                              pady=10, padx=20)
+
+        Button(canvas, text='Back', command=self.create_home_screen).grid(column=1, row=6, pady=60, padx=200)
+
+        self.score = ['', '', '']
 
     def create_test_cnfg_wn(self):
 
@@ -101,9 +114,9 @@ class Display:
                 self.words = [word for word in hard_text.split()]
 
         def begin_test():
-            usr_input = name_entry.get()
+            usr_input = name_entry.get().strip()
             if usr_input == '':
-                self.player_name = 'unspecified'
+                self.player_name = 'Unspecified'
             self.player_name = usr_input
             self.create_typing_test_wn()
 
@@ -133,18 +146,17 @@ class Display:
         name_entry = Entry(canvas, width=30)
         name_entry.grid(column=1, row=3, columnspan=3, pady=10, padx=10)
 
-        start_btn = Button(canvas, text='Start', width=7, command=begin_test)
-        start_btn.grid(column=1, row=4, pady=10, padx=10)
-
-        return_btn = Button(canvas, text='Back', width=7, command=self.create_home_screen)
-        return_btn.grid(column=2, row=4, pady=10, padx=10)
+        Button(canvas, text='Start', width=7, command=begin_test).grid(column=1, row=4, pady=10, padx=10)
+        Button(canvas, text='Back', width=7, command=self.create_home_screen).grid(column=2, row=4, pady=10, padx=10)
 
     def create_typing_test_wn(self):
 
         def end_test():
             self.window.after_cancel(self.timer_id)
             self.words = [word for word in medium_text.split()]
+            self.test_time = 60
             self.correct_words = ''
+            self.player_name = ''
             self.create_after_results_wn()
 
         def calculate_score(last_input: str, current_line: str):
@@ -153,7 +165,21 @@ class Display:
                     self.correct_words += f'{word} '
 
             chars_per_min = len(self.correct_words) / self.test_time * 60
-            words_per_min = len(self.correct_words.rstrip().split(' ')) / self.test_time * 60
+            if self.correct_words == '':
+                words_per_min = 0
+            else:
+                words_per_min = len(self.correct_words.rstrip().split(' ')) / self.test_time * 60
+
+            self.score = [self.player_name, str(int(words_per_min)), str(int(chars_per_min))]
+
+            self.scores.insert(0, self.score)
+            if len(self.scores) > 5:
+                del self.scores[-1]
+            print(self.scores)
+
+            with open('scores.txt', 'w') as file:
+                for score in self.scores:
+                    file.write(f"{','.join(score)}\n")
 
         def test_countdown(seconds: int):
             min_count = floor(seconds / 60)
@@ -228,9 +254,6 @@ class Display:
             except TclError:
                 break
 
-            with open('scores.txt', 'w') as file:
-                file.write(self.highscores)
-
         try:
             calculate_score(text_input.get(), text_line)
         except TclError:
@@ -249,5 +272,5 @@ class Display:
                                                                                        padx=200)
         Label(canvas, text='* If name is unspecified it will note as undefined').grid(column=1, row=4, pady=10,
                                                                                       padx=200)
-        Label(canvas, text='* High scores are saved internally').grid(column=1, row=5, pady=10, padx=200)
+        Label(canvas, text='* Last 5 scores are saved internally').grid(column=1, row=5, pady=10, padx=200)
         Button(canvas, text='Go home', command=self.create_home_screen).grid(column=1, row=6, pady=20, padx=200)
